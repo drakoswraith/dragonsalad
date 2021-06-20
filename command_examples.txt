@@ -1,0 +1,66 @@
+
+
+
+docker build -t netmech/dragonsalad:0.1.1 --build-arg BRANCH=main .
+
+docker run -p 8444:8444 -v /btrfs/btrvol0/chia/swar/config.yaml:/swar/config.yaml \
+-v /btrfs/btrvol0/chia/chia_home:/root/.chia \
+-v /btrfs/btrvol0/chia/plots/farmer_alex:/plots \
+-v /btrfs/btrvol1:/btrfs/btrvol1 \
+-v /btrfs/btrvol2:/btrfs/btrvol2 \
+-v /btrfs/btrvol3:/btrfs/btrvol3 \
+-v /btrfs/btrvol4:/btrfs/btrvol4 \
+-v /btrfs/btrvol5:/btrfs/btrvol5 \
+-v /btrfs/btrvol6:/btrfs/btrvol6 \
+-v /btrfs/btrvol7:/btrfs/btrvol7 \
+-v /btrfs/btrvol8:/btrfs/btrvol8 \
+-e TZ="America/New_York" -e keys="/root/.chia/keys.txt" --name dragonsalad -d netmech/dragonsalad:latest 
+
+docker exec -it dragonsalad venv/bin/chia configure -upnp false 
+(requires container restart)
+
+docker exec -it dragonsalad venv/bin/chia wallet show
+docker exec -it dragonsalad venv/bin/chia keys show --show-mnemonic-seed
+docker exec -it dragonsalad venv/bin/chia show -s -c
+
+
+Configure Docker to wait for mounts:
+
+systemctl edit docker.service
+
+[Unit]
+After=local-fs.target
+
+
+Then run:
+systemctl daemon-reload
+
+
+or the following to find mount
+
+SSH/login to your device.
+Run: systemctl list-unit-files | grep “.mount”
+Identify the disk that you would like to wait for
+Run: systemctl edit docker.service
+Then add:
+
+
+[root@alex system]# systemctl list-unit-files | grep ".mount"
+proc-sys-fs-binfmt_misc.automount             static
+dev-hugepages.mount                           static
+dev-mqueue.mount                              static
+proc-fs-nfsd.mount                            static
+proc-sys-fs-binfmt_misc.mount                 static
+sys-fs-fuse-connections.mount                 static
+sys-kernel-config.mount                       static
+sys-kernel-debug.mount                        static
+tmp.mount                                     disabled
+var-lib-nfs-rpc_pipefs.mount                  static
+dracut-mount.service                          static
+dracut-pre-mount.service                      static
+nfs-mountd.service                            static
+systemd-remount-fs.service                    static
+zfs-mount.service                             disabled
+umount.target                                 static
+
+
