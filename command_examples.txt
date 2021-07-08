@@ -1,9 +1,10 @@
 
 
 
-docker build -t netmech/dragonsalad:0.1.1 --build-arg BRANCH=main .
+docker build --no-cache -t netmech/dragonsalad:0.1.1 --build-arg BRANCH=main .
+docker build --no-cache -t netmech/dragonsalad:0.2.0 --build-arg BRANCH=main --build-arg TAG=tags/1.2.0 .
 
-docker run -p 8444:8444 -v /btrfs/btrvol0/chia/swar/config.yaml:/swar/config.yaml \
+docker run -p 8444:8444 -p 9090:9090 -v /btrfs/btrvol0/chia/swar/config.yaml:/swar/config.yaml \
 -v /btrfs/btrvol0/chia/chia_home:/root/.chia \
 -v /btrfs/btrvol0/chia/plots/farmer_alex:/plots \
 -v /btrfs/btrvol1:/btrfs/btrvol1 \
@@ -22,6 +23,7 @@ docker exec -it dragonsalad venv/bin/chia configure -upnp false
 docker exec -it dragonsalad venv/bin/chia wallet show
 docker exec -it dragonsalad venv/bin/chia keys show --show-mnemonic-seed
 docker exec -it dragonsalad venv/bin/chia show -s -c
+docker exec -it dragonsalad venv/bin/chia wallet get_address
 
 
 Configure Docker to wait for mounts:
@@ -62,5 +64,3 @@ nfs-mountd.service                            static
 systemd-remount-fs.service                    static
 zfs-mount.service                             disabled
 umount.target                                 static
-
-
