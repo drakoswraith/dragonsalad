@@ -4,6 +4,11 @@
 docker build --no-cache -t netmech/dragonsalad:0.1.1 --build-arg BRANCH=main .
 docker build --no-cache -t netmech/dragonsalad:0.2.0 --build-arg BRANCH=main --build-arg TAG=tags/1.2.0 .
 
+
+docker tag netmech/dragonsalad:0.2.1 netmech/dragonsalad:latest
+docker push netmech/dragonsalad:0.2.1
+docker push netmech/dragonsalad:latest
+
 docker run -p 8444:8444 -p 9090:9090 -v /btrfs/btrvol0/chia/swar/config.yaml:/swar/config.yaml \
 -v /btrfs/btrvol0/chia/chia_home:/root/.chia \
 -v /btrfs/btrvol0/chia/plots/farmer_alex:/plots \
@@ -25,42 +30,22 @@ docker exec -it dragonsalad venv/bin/chia keys show --show-mnemonic-seed
 docker exec -it dragonsalad venv/bin/chia show -s -c
 docker exec -it dragonsalad venv/bin/chia wallet get_address
 
+Pool Setup:
+Chia wallet get_address
 
-Configure Docker to wait for mounts:
+Get chia from faucet  (https://faucet.chia.net/request)
 
-systemctl edit docker.service
+ chia plotnft create -s local
+(confirm)
 
-[Unit]
-After=local-fs.target
-
-
-Then run:
-systemctl daemon-reload
-
-
-or the following to find mount
-
-SSH/login to your device.
-Run: systemctl list-unit-files | grep “.mount”
-Identify the disk that you would like to wait for
-Run: systemctl edit docker.service
-Then add:
+To Check status: 
+chia wallet get_transaction -f <sig> -tx <transition ID>
 
 
-[root@alex system]# systemctl list-unit-files | grep ".mount"
-proc-sys-fs-binfmt_misc.automount             static
-dev-hugepages.mount                           static
-dev-mqueue.mount                              static
-proc-fs-nfsd.mount                            static
-proc-sys-fs-binfmt_misc.mount                 static
-sys-fs-fuse-connections.mount                 static
-sys-kernel-config.mount                       static
-sys-kernel-debug.mount                        static
-tmp.mount                                     disabled
-var-lib-nfs-rpc_pipefs.mount                  static
-dracut-mount.service                          static
-dracut-pre-mount.service                      static
-nfs-mountd.service                            static
-systemd-remount-fs.service                    static
-zfs-mount.service                             disabled
-umount.target                                 static
+Running Swar:
+(configure /swar/config.yaml on host system - mounted via volume in above docker run command)
+docker exec -it dragonsalad /bin/bash
+. ./venv/bin/activate
+cd /swar
+python manager.py start
+python manager.py status
