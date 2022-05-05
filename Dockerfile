@@ -15,7 +15,7 @@ ENV TZ="UTC"
 ARG BRANCH
 ARG TAG
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3-dev python3.8-venv python3.8-distutils apt nfs-common python-is-python3 vim tzdata
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3-dev python3-venv python3-distutils apt nfs-common python-is-python3 vim tzdata
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
@@ -31,8 +31,7 @@ RUN cd / \
 && git clone https://github.com/swar/Swar-Chia-Plot-Manager.git /swar \
 && cd /swar \
 && . /chia-blockchain/venv/bin/activate \
-&& pip install -r requirements.txt \
-&& pip install -r requirements-notification.txt
+&& pip install dateparser psutil PyYAML discord_notify playsound prometheus-client telegram_notifier requests
 
 ENV PATH=/chia-blockchain/venv/bin/:$PATH
 WORKDIR /chia-blockchain
